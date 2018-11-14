@@ -6,7 +6,7 @@
 
 ## Links
 
-- Deployed API:
+- Deployed API: https://figjam.herokuapp.com/
 - Docs for figma API: https://documenter.getpostman.com/view/1836603/RzZAmJcw
 - Docs for figjam API: https://documenter.getpostman.com/view/1836603/RzZAmJcx
 
