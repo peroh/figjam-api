@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 
 const request = require("request");
+require("dotenv").config();
 
 // Set up the express app
 const app = express();
@@ -11,10 +12,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Get the file information for particular project from figma API
-function getProjectFileDetails(idProject, callback) {
+function makeRequest(url, callback) {
   request(
     {
-      url: "https://api.figma.com/v1/projects/" + idProject + "/files",
+      url: url,
       json: true,
       headers: {
         "X-Figma-Token": process.env.TOKEN
@@ -24,8 +25,7 @@ function getProjectFileDetails(idProject, callback) {
       if (err) {
         return console.log(err);
       }
-      console.log(body.files);
-      return callback(body.files);
+      callback(body);
     }
   );
   // TODO: parse file info and save to files variable maybe?
@@ -37,28 +37,43 @@ function getProjectFileDetails(idProject, callback) {
 // Note: This will probably be replaced by a more specific call e.g. frames
 app.get("/api/v1/:idProject/files", (req, res) => {
   const idProject = parseInt(req.params.idProject, 10);
+  var url =
+    "https://api.figma.com/v1/projects/" + process.env.ID_PROJECT + "/files";
 
   // 1. get files in project
   // TEST: print the file details for project
-  getProjectFileDetails(idProject, function(response) {
-    var files = response;
-    console.log(files);
+  makeRequest(url, function(response) {
+    // 2. check if file relating to stage exists
+    // 3. check for any overwritten versions
+    // 4. get correct version (if there is an overwritten version)
+    // 5. get frames for file
+
+    // TEST: get files for version 30
+    res.status(200).send({
+      success: "true",
+      message: "files retrieved successfully",
+      // TODO need to replace with actual file information
+      files: ["file1", "file2"]
+    });
   });
+});
 
-  // 2. check if file relating to stage exists
-
-  // 3. check for any overwritten versions
-
-  // 4. get correct version (if there is an overwritten version)
-
-  // 5. get frames for file
-
-  // TEST: get files for version 30
-  res.status(200).send({
-    success: "true",
-    message: "files retrieved successfully",
-    // TODO need to replace with actual file information
-    files: ["file1", "file2"]
+app.get("/api/v1/title", (req, res) => {
+  var url =
+    "https://api.figma.com/v1/teams/" + process.env.ID_TEAM + "/projects";
+  makeRequest(url, function(response) {
+    var title;
+    var projects = response.projects;
+    for (const proj of projects) {
+      if (proj.id == process.env.ID_PROJECT) {
+        title = proj.name;
+      }
+    }
+    res.status(200).send({
+      success: "true",
+      message: "got project name successfully",
+      title: title
+    });
   });
 });
 
