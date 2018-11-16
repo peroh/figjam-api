@@ -51,6 +51,10 @@ app.get("/api/v1/cover/:stage", (req, res) => {
     var file = response.files.find(function(element) {
       return element.name === "2018-03-PDP-buyX-" + stage + "%";
     });
+    if (file == null) {
+      res.status(404).send("File not found");
+      return;
+    }
     // console.log(file.thumbnail_url);
     var thumbnail_url =
       "https://s3-alpha.figma.com/thumbnails/" +
